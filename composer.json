@@ -16,6 +16,6 @@
 	"require": {},
 	"require-dev": {},
 	"scripts": {
-		"test": "bin/pronamic-wp-i18n-text-domain-replacer --dir=tests --old-text-domain=old --new-text-domain=new"
+		"test": "bin/pronamic-wp-i18n-text-domain-replacer --dir=tests --text-domain-search=old --text-domain-search=older text-domain-search-block-development-examples --text-domain-replace=new --exclude=exclude"
 	}
 }

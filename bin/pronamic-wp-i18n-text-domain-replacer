@@ -4,9 +4,10 @@
 $options = getopt(
 	'',
 	[
-        'old-text-domain:',
-        'new-text-domain:',
 		'dir::',
+        'exclude::',
+        'text-domain-search:',
+        'text-domain-replace:',
 	]
 );
 
@@ -16,44 +17,49 @@ if ( array_key_exists( 'dir', $options ) ) {
 	$dir = $options['dir'];
 }
 
-var_dump( $options );
-exit;
+$exclude = [];
 
-$baseDir = $dir;
+if ( array_key_exists( 'exclude', $options ) ) {
+    $exclude = $options['exclude'];
+}
 
-$excludedDirs = [ 'vendor', 'node_modules', 'build' ]; // Pas aan naar wens
+if ( ! is_array( $exclude ) ) {
+    $exclude = [ $exclude ];
+}
 
-$directoryIterator = new RecursiveDirectoryIterator(
-	$baseDir,
-	RecursiveDirectoryIterator::SKIP_DOTS
+$text_domain_search = $options['text-domain-search'];
+
+if ( ! is_array( $text_domain_search ) ) {
+    $text_domain_search = [ $text_domain_search ];
+}
+
+$text_domain_replace = $options['text-domain-replace'];
+
+echo 'Working directory: ', $dir, PHP_EOL;
+echo 'Excluding directories: ', implode( ', ', $exclude ), PHP_EOL;
+echo 'Text domain search: ', implode( ', ', $text_domain_search ), PHP_EOL;
+echo 'Text domain replace: ', $text_domain_replace, PHP_EOL;
+
+$iterator = new RecursiveCallbackFilterIterator(
+	new RecursiveDirectoryIterator(
+    	$dir,
+	    RecursiveDirectoryIterator::SKIP_DOTS
+    ),
+	function ( $current ) use ( $exclude ) {
+		return ! in_array( $current->getFilename(), $exclude, true );
+	}
 );
 
-$filterIterator = new RecursiveCallbackFilterIterator(
-	$directoryIterator,
-	function ( $current, $key, $iterator ) use ( $excludedDirs ) {
-		if ( $current->isDir() ) {
-			$dirname = $current->getFilename();
-			return ! in_array( $dirname, $excludedDirs, true ); // Sluit map uit
-		}
-
+$iterator_block_json_files = new RecursiveCallbackFilterIterator(
+	$iterator,
+	function ( $current ) {
 		return $current->isFile() && $current->getFilename() === 'block.json';
 	}
 );
 
-$iterator = new RecursiveIteratorIterator( $filterIterator );
+$files = new RecursiveIteratorIterator( $iterator_block_json_files );
 
-$allowedDomains = [
-	'action-scheduler',
-	'pronamic_ideal',
-	'pronamic-datetime',
-	'pronamic-forms',
-	'pronamic-money',
-	'pronamic-pay-mollie',
-];
-
-$newTextDomain = 'pronamic-pay-doneren-met-mollie';
-
-foreach ( $iterator as $file ) {
+foreach ( $files as $file ) {
 	echo 'Gevonden: ' . $file->getPathname() . PHP_EOL;
 
 	$contents = file_get_contents( $file );
@@ -62,12 +68,12 @@ foreach ( $iterator as $file ) {
 
 	$replaced = preg_replace_callback(
 		$pattern,
-		function ( $matches ) use ( $allowedDomains, $newTextDomain ) {
-			if ( in_array( $matches['domain'], $allowedDomains, true ) ) {
-				return $matches['prefix'] . $newTextDomain . $matches['suffix'];
+		function ( $matches ) use ( $text_domain_search, $text_domain_replace ) {
+			if ( in_array( $matches['domain'], $text_domain_search, true ) ) {
+				return $matches['prefix'] . $text_domain_replace . $matches['suffix'];
 			}
 
-			return $matches[0]; // geen wijziging
+			return $matches[0];
 		},
 		$contents
 	);
@@ -79,6 +85,8 @@ foreach ( $iterator as $file ) {
 		echo "Geen vervanging nodig voor $file\n";
 	}
 }
+
+exit;
 
 $patterns = [
 	// __() function pattern
