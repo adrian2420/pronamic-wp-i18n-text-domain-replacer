@@ -1,3 +1,3 @@
 function() {
-    return __( 'test', 'old');
+    return __( 'test', 'old' );
 }
