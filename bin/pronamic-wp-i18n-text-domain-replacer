@@ -13,31 +13,31 @@ $options = getopt(
 
 $dir = __DIR__;
 
-if (array_key_exists('dir', $options)) {
+if ( array_key_exists( 'dir', $options ) ) {
 	$dir = $options['dir'];
 }
 
 $exclude = [];
 
-if (array_key_exists('exclude', $options)) {
+if ( array_key_exists( 'exclude', $options ) ) {
 	$exclude = $options['exclude'];
 }
 
-if (! is_array($exclude)) {
-	$exclude = [$exclude];
+if ( ! is_array( $exclude ) ) {
+	$exclude = [ $exclude ];
 }
 
 $text_domain_search = $options['text-domain-search'];
 
-if (! is_array($text_domain_search)) {
-	$text_domain_search = [$text_domain_search];
+if ( ! is_array( $text_domain_search ) ) {
+	$text_domain_search = [ $text_domain_search ];
 }
 
 $text_domain_replace = $options['text-domain-replace'];
 
 echo 'Working directory: ', $dir, PHP_EOL;
-echo 'Excluding directories: ', implode(', ', $exclude), PHP_EOL;
-echo 'Text domain search: ', implode(', ', $text_domain_search), PHP_EOL;
+echo 'Excluding directories: ', implode( ', ', $exclude ), PHP_EOL;
+echo 'Text domain search: ', implode( ', ', $text_domain_search ), PHP_EOL;
 echo 'Text domain replace: ', $text_domain_replace, PHP_EOL;
 
 $iterator = new RecursiveCallbackFilterIterator(
@@ -45,31 +45,31 @@ $iterator = new RecursiveCallbackFilterIterator(
 		$dir,
 		RecursiveDirectoryIterator::SKIP_DOTS
 	),
-	function ($current) use ($exclude) {
-		return ! in_array($current->getFilename(), $exclude, true);
+	function ( $current ) use ( $exclude ) {
+		return ! in_array( $current->getFilename(), $exclude, true );
 	}
 );
 
 $iterator_block_json_files = new RecursiveCallbackFilterIterator(
 	$iterator,
-	function ($current) {
+	function ( $current ) {
 		return $current->isFile() && $current->getFilename() === 'block.json';
 	}
 );
 
-$files = new RecursiveIteratorIterator($iterator_block_json_files);
+$files = new RecursiveIteratorIterator( $iterator_block_json_files );
 
-foreach ($files as $file) {
+foreach ( $files as $file ) {
 	echo 'Gevonden: ' . $file->getPathname() . PHP_EOL;
 
-	$contents = file_get_contents($file);
+	$contents = file_get_contents( $file );
 
 	$pattern = '/(?<prefix>"textdomain"\s*:\s*")(?<domain>[a-zA-Z0-9_-]+)(?<suffix>")/';
 
 	$replaced = preg_replace_callback(
 		$pattern,
-		function ($matches) use ($text_domain_search, $text_domain_replace) {
-			if (in_array($matches['domain'], $text_domain_search, true)) {
+		function ( $matches ) use ( $text_domain_search, $text_domain_replace ) {
+			if ( in_array( $matches['domain'], $text_domain_search, true ) ) {
 				return $matches['prefix'] . $text_domain_replace . $matches['suffix'];
 			}
 
@@ -78,8 +78,8 @@ foreach ($files as $file) {
 		$contents
 	);
 
-	if ($replaced !== $contents) {
-		file_put_contents($file, $replaced);
+	if ( $replaced !== $contents ) {
+		file_put_contents( $file, $replaced );
 		echo "Textdomain vervangen in $file\n";
 	} else {
 		echo "Geen vervanging nodig voor $file\n";
@@ -129,30 +129,30 @@ $patterns = [
 
 $filterIterator = new RecursiveCallbackFilterIterator(
 	$directoryIterator,
-	function ($current, $key, $iterator) use ($excludedDirs) {
-		if ($current->isDir()) {
+	function ( $current, $key, $iterator ) use ( $excludedDirs ) {
+		if ( $current->isDir() ) {
 			$dirname = $current->getFilename();
-			return ! in_array($dirname, $excludedDirs, true); // Sluit map uit
+			return ! in_array( $dirname, $excludedDirs, true ); // Sluit map uit
 		}
 
-		return $current->isFile() && \in_array($current->getExtension(), ['js', 'php'], true);
+		return $current->isFile() && \in_array( $current->getExtension(), [ 'js', 'php' ], true );
 	}
 );
 
-$iterator = new RecursiveIteratorIterator($filterIterator);
+$iterator = new RecursiveIteratorIterator( $filterIterator );
 
-foreach ($iterator as $file) {
+foreach ( $iterator as $file ) {
 	echo 'Gevonden: ' . $file->getPathname() . PHP_EOL;
 
-	$orignial = file_get_contents($file);
+	$orignial = file_get_contents( $file );
 
 	$contents = $orignial;
 
-	foreach ($patterns as $pattern) {
+	foreach ( $patterns as $pattern ) {
 		$contents = preg_replace_callback(
 			$pattern,
-			function ($matches) use ($allowedDomains, $newTextDomain) {
-				if (in_array($matches['domain'], $allowedDomains, true)) {
+			function ( $matches ) use ( $allowedDomains, $newTextDomain ) {
+				if ( in_array( $matches['domain'], $allowedDomains, true ) ) {
 					return $matches['prefix'] . $matches['quote'] . $newTextDomain . $matches['quote'] . $matches['suffix'];
 				}
 				// Geen wijziging als niet in whitelist
@@ -162,8 +162,8 @@ foreach ($iterator as $file) {
 		);
 	}
 
-	if ($orignial !== $contents) {
-		file_put_contents($file, $contents);
+	if ( $orignial !== $contents ) {
+		file_put_contents( $file, $contents );
 		echo "Textdomain vervangen in $file\n";
 	} else {
 		echo "Geen vervanging nodig voor $file\n";
