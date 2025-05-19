@@ -11,10 +11,14 @@
 		"bin/pronamic-wp-i18n-text-domain-replacer"
 	],
 	"config": {
-		"sort-packages": true
+		"sort-packages": true,
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
 	},
-	"require": {},
-	"require-dev": {},
+	"require-dev": {
+		"pronamic/wp-coding-standards": "^2.3"
+	},
 	"scripts": {
 		"test": "bin/pronamic-wp-i18n-text-domain-replacer --dir=tests --text-domain-search=old --text-domain-search=older --text-domain-search=block-development-examples --text-domain-replace=new --exclude=exclude"
 	}
