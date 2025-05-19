@@ -4,6 +4,8 @@
 $options = getopt(
 	'',
 	[
+        'old-text-domain:',
+        'new-text-domain:',
 		'dir::',
 	]
 );
@@ -13,6 +15,9 @@ $dir = __DIR__;
 if ( array_key_exists( 'dir', $options ) ) {
 	$dir = $options['dir'];
 }
+
+var_dump( $options );
+exit;
 
 $baseDir = $dir;
 
