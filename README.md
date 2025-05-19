@@ -1,12 +1,11 @@
-# pronamic-wp-i18n-text-domain-replacer
+# Pronamic WordPress internationalization text domain replacer
 
-A developer tool for replacing WordPress translation text domains in PHP, JavaScript, and block.json files.
+A developer tool for replacing WordPress translation text domains in PHP, JavaScript, and `block.json` files.
 
 ## npm
 
 - https://www.npmjs.com/package/@automattic/babel-plugin-replace-textdomain
 - https://www.npmjs.com/package/wp-textdomain
-
 
 ## Links
 
