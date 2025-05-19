@@ -55,6 +55,10 @@ $exclude_filter_iterator = new RecursiveCallbackFilterIterator(
 $block_json_filter_iterator = new RecursiveCallbackFilterIterator(
 	$exclude_filter_iterator,
 	function ( $current ) {
+		if ( $current->isDir() ) {
+			return true;
+		}
+
 		return $current->isFile() && $current->getFilename() === 'block.json';
 	}
 );
@@ -255,7 +259,11 @@ foreach ( $types as $type => $functions ) {
 
 	$filter_iterator = new RecursiveCallbackFilterIterator(
 		$exclude_filter_iterator,
-		function ( $current ) use ( $type ){
+		function ( $current ) use ( $type ) {
+			if ( $current->isDir() ) {
+				return true;
+			}
+
 			return $current->isFile() && $current->getExtension() === $type;
 		}
 	);
