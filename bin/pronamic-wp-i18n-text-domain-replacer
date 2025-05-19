@@ -40,27 +40,29 @@ echo 'Excluding directories: ', implode( ', ', $exclude ), PHP_EOL;
 echo 'Text domain search: ', implode( ', ', $text_domain_search ), PHP_EOL;
 echo 'Text domain replace: ', $text_domain_replace, PHP_EOL;
 
-$iterator = new RecursiveCallbackFilterIterator(
-	new RecursiveDirectoryIterator(
-		$dir,
-		RecursiveDirectoryIterator::SKIP_DOTS
-	),
+$directory_iterator = new RecursiveDirectoryIterator(
+	$dir,
+	RecursiveDirectoryIterator::SKIP_DOTS
+);
+
+$exclude_filter_iterator = new RecursiveCallbackFilterIterator(
+	$directory_iterator,
 	function ( $current ) use ( $exclude ) {
 		return ! in_array( $current->getFilename(), $exclude, true );
 	}
 );
 
-$iterator_block_json_files = new RecursiveCallbackFilterIterator(
-	$iterator,
+$block_json_filter_iterator = new RecursiveCallbackFilterIterator(
+	$exclude_filter_iterator,
 	function ( $current ) {
 		return $current->isFile() && $current->getFilename() === 'block.json';
 	}
 );
 
-$files = new RecursiveIteratorIterator( $iterator_block_json_files );
+$block_json_files = new RecursiveIteratorIterator( $block_json_filter_iterator );
 
-foreach ( $files as $file ) {
-	echo 'Gevonden: ' . $file->getPathname() . PHP_EOL;
+foreach ( $block_json_files as $file ) {
+	echo "[INFO] Processing: ", $file->getPathname(), PHP_EOL;
 
 	$contents = file_get_contents( $file );
 
@@ -80,92 +82,213 @@ foreach ( $files as $file ) {
 
 	if ( $replaced !== $contents ) {
 		file_put_contents( $file, $replaced );
-		echo "Textdomain vervangen in $file\n";
+		
+		echo "[SUCCESS] Text domain replaced in: ", $file->getPathname(), PHP_EOL;
 	} else {
-		echo "Geen vervanging nodig voor $file\n";
+		echo "[SKIP] No replacement needed for: ", $file->getPathname(), PHP_EOL;
 	}
 }
 
-exit;
+/**
+ * Helper.
+ */
+function create_patterns( $functions ) {
+	$patterns = [];
 
-$patterns = [
-	// __() function pattern
-	'/
-    (?<prefix>__\s*\(\s*[^,]+,\s*)
-    (?<quote>["\'])
-    (?<domain>[a-zA-Z0-9_-]+)
-    \k<quote>
-    (?<suffix>\s*\))
-    /x',
+	foreach ( $functions as $function => $item ) {
+		$pattern = [];
 
-	// _n() function pattern
-	'/
-    (?<prefix>_n\s*\(\s*[^,]+,\s*[^,]+,\s*[^,]+,\s*)  # Match the function name _n with three preceding arguments,
-                                                      # capturing up to and including the comma after the third argument.
+		$pattern[] = '(?<![a-zA-Z0-9_])'; 
 
-    (?<quote>["\'])                                   # Capture the opening quote (single or double) of the text domain string.
+		$pattern[] = '(?<prefix>' . $function . '\s*\(' . str_repeat( '\s*[^,]+,', $item['position'] - 1 ) . '\s*)';
+		$pattern[] = '(?<quote>["\'])';
+		$pattern[] = '(?<domain>[a-zA-Z0-9_-]+)';
+		$pattern[] = '\k<quote>';
 
-    (?<domain>[a-zA-Z0-9_-]+)                         # Capture the text domain.
+		$patterns[] = '/' . implode( '', $pattern ) . '/';
+	}
 
-    \k<quote>                                        # Match the exact same closing quote.
+	return $patterns;
+}
 
-    (?<suffix>\s*\))                                 # Capture trailing whitespace and the closing parenthesis.
-    /x',
+/**
+ * PHP functions.
+ * 
+ * @link https://github.com/WordPress/WordPress-Coding-Standards/blob/38168bc542ec3565c04f2a88498a2024cdfd9ba1/WordPress/Sniffs/Utils/I18nTextDomainFixerSniff.php#L72-L229
+ */
+$php_functions = [
+	'load_textdomain'             => [
+		'position' => 1,
+		'name'     => 'domain',
+	],
+	'load_plugin_textdomain'      => [
+		'position' => 1,
+		'name'     => 'domain',
+	],
+	'load_muplugin_textdomain'    => [
+		'position' => 1,
+		'name'     => 'domain',
+	],
+	'load_theme_textdomain'       => [
+		'position' => 1,
+		'name'     => 'domain',
+	],
+	'load_child_theme_textdomain' => [
+		'position' => 1,
+		'name'     => 'domain',
+	],
+	'load_script_textdomain'      => [
+		'position' => 2,
+		'name'     => 'domain',
+	],
+	'unload_textdomain'           => [
+		'position' => 1,
+		'name'     => 'domain',
+	],
 
-	// _x() function pattern
-	'/
-    (?<prefix>_x\s*\(\s*[^,]+,\s*[^,]+,\s*)          # Match the function name _x with two preceding arguments,
-                                                      # capturing up to and including the comma after the second argument.
+	'__'                          => [
+		'position' => 2,
+		'name'     => 'domain',
+	],
+	'_e'                          => [
+		'position' => 2,
+		'name'     => 'domain',
+	],
+	'_x'                          => [
+		'position' => 3,
+		'name'     => 'domain',
+	],
+	'_ex'                         => [
+		'position' => 3,
+		'name'     => 'domain',
+	],
+	'_n'                          => [
+		'position' => 4,
+		'name'     => 'domain',
+	],
+	'_nx'                         => [
+		'position' => 5,
+		'name'     => 'domain',
+	],
+	'_n_noop'                     => [
+		'position' => 3,
+		'name'     => 'domain',
+	],
+	'_nx_noop'                    => [
+		'position' => 4,
+		'name'     => 'domain',
+	],
+	'translate_nooped_plural'     => [
+		'position' => 3,
+		'name'     => 'domain',
+	],
 
-    (?<quote>["\'])                                   # Capture the opening quote.
+	'esc_html__'                  => [
+		'position' => 2,
+		'name'     => 'domain',
+	],
+	'esc_html_e'                  => [
+		'position' => 2,
+		'name'     => 'domain',
+	],
+	'esc_html_x'                  => [
+		'position' => 3,
+		'name'     => 'domain',
+	],
+	'esc_attr__'                  => [
+		'position' => 2,
+		'name'     => 'domain',
+	],
+	'esc_attr_e'                  => [
+		'position' => 2,
+		'name'     => 'domain',
+	],
+	'esc_attr_x'                  => [
+		'position' => 3,
+		'name'     => 'domain',
+	],
 
-    (?<domain>[a-zA-Z0-9_-]+)                         # Capture the text domain.
-
-    \k<quote>                                        # Match the exact same closing quote.
-
-    (?<suffix>\s*\))                                 # Capture trailing whitespace and the closing parenthesis.
-    /x',
+	'is_textdomain_loaded'        => [
+		'position' => 1,
+		'name'     => 'domain',
+	],
+	'get_translations_for_domain' => [
+		'position' => 1,
+		'name'     => 'domain',
+	],
 ];
 
-$filterIterator = new RecursiveCallbackFilterIterator(
-	$directoryIterator,
-	function ( $current, $key, $iterator ) use ( $excludedDirs ) {
-		if ( $current->isDir() ) {
-			$dirname = $current->getFilename();
-			return ! in_array( $dirname, $excludedDirs, true ); // Sluit map uit
+/**
+ * JavaScript functions.
+ * 
+ * @link https://github.com/WordPress/gutenberg/blob/ab5c79cd40adbb68898536c50e035b0a734338ea/packages/i18n/src/index.js#L9-L12
+ */
+$js_functions = [
+	'__'  => [
+		'position' => 2,
+		'name'     => 'domain',
+	],
+	'_x'  => [
+		'position' => 3,
+		'name'     => 'domain',
+	],
+	'_n'  => [
+		'position' => 4,
+		'name'     => 'domain',
+	],
+	'_nx' => [
+		'position' => 5,
+		'name'     => 'domain',
+	],
+];
+
+/**
+ * Types
+ */
+$types = [
+	'js'  => $js_functions,
+	'php' => $php_functions,
+];
+
+foreach ( $types as $type => $functions ) {
+	$patterns = create_patterns( $functions );
+
+	$filter_iterator = new RecursiveCallbackFilterIterator(
+		$exclude_filter_iterator,
+		function ( $current ) use ( $type ){
+			return $current->isFile() && $current->getExtension() === $type;
+		}
+	);
+
+	$files = new RecursiveIteratorIterator( $filter_iterator );
+
+	foreach ( $files as $file ) {
+		echo "[INFO] Processing: ", $file->getPathname(), PHP_EOL;
+
+		$orignial = file_get_contents( $file );
+
+		$contents = $orignial;
+
+		foreach ( $patterns as $pattern ) {
+			$contents = preg_replace_callback( 
+				$pattern,
+				function ( $matches ) use ( $text_domain_search, $text_domain_replace ) {
+					if ( in_array( $matches['domain'], $text_domain_search, true ) ) {
+						return $matches['prefix'] . $matches['quote'] . $text_domain_replace . $matches['quote'];
+					}
+
+					return $matches[0];
+				},
+				$contents
+			);
 		}
 
-		return $current->isFile() && \in_array( $current->getExtension(), [ 'js', 'php' ], true );
-	}
-);
-
-$iterator = new RecursiveIteratorIterator( $filterIterator );
-
-foreach ( $iterator as $file ) {
-	echo 'Gevonden: ' . $file->getPathname() . PHP_EOL;
-
-	$orignial = file_get_contents( $file );
-
-	$contents = $orignial;
-
-	foreach ( $patterns as $pattern ) {
-		$contents = preg_replace_callback(
-			$pattern,
-			function ( $matches ) use ( $allowedDomains, $newTextDomain ) {
-				if ( in_array( $matches['domain'], $allowedDomains, true ) ) {
-					return $matches['prefix'] . $matches['quote'] . $newTextDomain . $matches['quote'] . $matches['suffix'];
-				}
-				// Geen wijziging als niet in whitelist
-				return $matches[0];
-			},
-			$contents
-		);
-	}
-
-	if ( $orignial !== $contents ) {
-		file_put_contents( $file, $contents );
-		echo "Textdomain vervangen in $file\n";
-	} else {
-		echo "Geen vervanging nodig voor $file\n";
+		if ( $orignial !== $contents ) {
+			file_put_contents( $file, $contents );
+			
+			echo "[SUCCESS] Text domain replaced in: ", $file->getPathname(), PHP_EOL;
+		} else {
+			echo "[SKIP] No replacement needed for: ", $file->getPathname(), PHP_EOL;
+		}
 	}
 }
