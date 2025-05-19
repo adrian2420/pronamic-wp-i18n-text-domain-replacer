@@ -9,8 +9,9 @@ A developer tool for replacing WordPress translation text domains in PHP, JavaSc
 
 ## Links
 
-- https://github.com/timelsass/wp-textdomain
 - https://github.com/Automattic/babel-plugin-replace-textdomain
+- https://github.com/timelsass/wp-textdomain
+- https://github.com/varunsridharan/wp-cli-textdomain
 - https://github.com/wp-cli/i18n-command
 - https://github.com/WordPress/WordPress-Coding-Standards/wiki/Customizable-sniff-properties#wordpressutilsi18ntextdomainfixer-replace-a-text_domain
-- https://github.com/varunsridharan/wp-cli-textdomain
+- https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/internationalization.md
